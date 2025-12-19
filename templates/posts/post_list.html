@@ -1,0 +1,7 @@
+{% for post in posts %}
+<h2>{{ post.title }}</h2>
+<p>
+  Author: {{ post.author.username }} <br />
+  Bio: {{ post.author.profile.bio }}
+</p>
+{% endfor %}

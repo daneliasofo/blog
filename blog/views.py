@@ -1,22 +1,32 @@
-from django.shortcuts import render
-
+from django.views.generic import ListView,DetailView
 from .models import Post
 
-def post_list(request):
-    posts = Post.objects.select_related(
-        'author',        
-        'author__profile'  
-    )
 
-    return render(request, 'blog/post_list.html', {'posts': posts})
+class PostListView(ListView):
+    model = Post
+    template_name = "posts/post_list.html"
+    object_name = "post"
 
-def post_detail(request, post_id):
-    (
-        Post.objects.prefetch_related(
-            'comments__user',  
-            'tags'            
-        ),
-        id=post_id
-    )
+    def get_queryset(self):
+        return (
+            Post.objects
+            .select_related("author", "author__profile")
+            .all()
+        )
 
-    return render(request, 'blog/post_detail.html', {'post': post})
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "posts/post_detail.html"
+    object_name = "post"
+
+    def get_queryset(self):
+        return (
+            Post.objects
+            .select_related("author")
+            .prefetch_related(
+                "comments__author",
+                "tags"
+            )
+            .all()
+        )
